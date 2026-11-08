@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng Tuần Hoàn Hóa Học Thông Minh</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .periodic-grid {
+            display: grid;
+            grid-template-columns: repeat(18, minmax(0, 1fr));
+            gap: 4px;
+        }
+        .lanthanide-actinide-grid {
+            display: grid;
+            grid-template-columns: repeat(15, minmax(0, 1fr));
+            gap: 4px;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-full flex flex-col antialiased">
+
+    <!-- Header -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-30 px-4 py-3 shadow-md">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-indigo-600 to-violet-500 p-2.5 rounded-xl shadow-lg shadow-indigo-500/20 text-white">
+                    <i class="fa-solid fa-atom text-xl animate-spin" style="animation-duration: 12s;"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg md:text-xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">Bảng Tuần Hoàn Thông Minh (118 Nguyên Tố)</h1>
+                    <p class="text-xs text-slate-400">Tra cứu chi tiết cấu hình, tính chất & hợp chất hóa học đầy đủ</p>
+                </div>
+            </div>
+
+            <!-- Search & Quick Filters -->
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <div class="relative w-full md:w-72">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                    </span>
+                    <input type="text" id="searchInput" placeholder="Tìm theo tên, ký hiệu hoặc Z (1-118)..." 
+                        class="w-full pl-9 pr-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all">
+                </div>
+                <button onclick="resetFilters()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-lg transition border border-slate-700 whitespace-nowrap">
+                    <i class="fa-solid fa-rotate-right mr-1"></i> Đặt lại
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 flex flex-col gap-6">
+
+        <!-- Legend & Category filters -->
+        <div class="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3 flex flex-wrap items-center justify-center gap-2.5 text-xs">
+            <button onclick="filterCategory('all')" class="cat-btn px-3 py-1.5 rounded-lg font-medium transition bg-indigo-600 text-white shadow-sm" data-cat="all">Tất cả (118)</button>
+            <button onclick="filterCategory('alkali')" class="cat-btn px-3 py-1.5 rounded-lg font-medium transition bg-slate-800 hover:bg-slate-700 text-red-300 border border-red-900/50" data-cat="alkali">Kim loại kiềm</button>
+            <button onclick="filterCategory('alkaline')" class="cat-btn px-3 py-1.5 rounded-lg font-medium transition bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-900/50" data-cat="alkaline">Kiềm thổ</button>
+            <button onclick="filterCategory('transition')" class="cat-btn px-3 py-1.5 rounded-lg font-medium transition bg-slate-800 hover:bg-slate-700 text-blue-300 border border-blue-900/50" data-cat="transition">KL Chuyển tiếp</button>
+            <button onclick="filterCategory('post-transition')" class="cat-btn px-3 py-1.5 rounded-lg font-medium transition bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-900/50" data-cat="post-transition">KL Sau chuyển tiếp</button>
+            <button onclick="filterCategory('metalloid')" class="cat-btn px-3 py-1.5 rounded-lg font-medium transition bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-900/50" data-cat="metalloid">Á kim</button>
+            <button onclick="filterCategory('nonmetal')" class="cat-btn px-3 py-1.5 rounded-lg font-medium transition bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-900/50" data-cat="nonmetal">Phi kim</button>
+            <button onclick="filterCategory('halogen')" class="cat-btn px-3 py-1.5 rounded-lg font-medium transition bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-900/50" data-cat="halogen">Halogen</button>
+            <button onclick="filterCategory('noble')" class="cat-btn px-3 py-1.5 rounded-lg font-medium transition bg-slate-800 hover:bg-slate-700 text-pink-300 border border-pink-900/50" data-cat="noble">Khí hiếm</button>
+            <button onclick="filterCategory('lanthanide')" class="cat-btn px-3 py-1.5 rounded-lg font-medium transition bg-slate-800 hover:bg-slate-700 text-rose-300 border border-rose-900/50" data-cat="lanthanide">Họ Lantan</button>
+            <button onclick="filterCategory('actinide')" class="cat-btn px-3 py-1.5 rounded-lg font-medium transition bg-slate-800 hover:bg-slate-700 text-orange-300 border border-orange-900/50" data-cat="actinide">Họ Actini</button>
+        </div>
+
+        <!-- Periodic Table Grid Container (Scrollable on small screens) -->
+        <div class="overflow-x-auto pb-4">
+            <div class="min-w-[1050px] bg-slate-900/80 border border-slate-800 p-4 rounded-2xl shadow-xl backdrop-blur-md flex flex-col gap-5">
+                <!-- Main Grid (Period 1 to 7) -->
+                <div>
+                    <h3 class="text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">Bảng Nguyên Tố Chính (1 - 118)</h3>
+                    <div id="periodicTable" class="periodic-grid">
+                        <!-- Dynamically injected via JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Lanthanides & Actinides Separate Block -->
+                <div class="pt-3 border-t border-slate-800/80 flex flex-col gap-2">
+                    <div class="flex items-center justify-between text-xs text-slate-400 font-semibold uppercase tracking-wider">
+                        <span>Họ Lanthanide (57-71) & Actinide (89-103)</span>
+                    </div>
+                    
+                    <div class="flex flex-col gap-1.5 pl-12">
+                        <div id="lanthanideRow" class="lanthanide-actinide-grid"></div>
+                        <div id="actinideRow" class="lanthanide-actinide-grid"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info & Quick Help Note -->
+        <div class="bg-indigo-950/20 border border-indigo-900/40 rounded-xl p-4 text-xs text-indigo-200/80 flex items-start gap-3">
+            <i class="fa-solid fa-circle-info text-indigo-400 text-base mt-0.5"></i>
+            <div>
+                <span class="font-semibold text-indigo-300">Tính năng thông minh:</span> Nhấp vào bất kỳ nguyên tố nào trong số 118 nguyên tố để mở bảng chi tiết thông số: Cấu hình electron lớp ngoài cùng, độ âm điện, hóa trị với Oxygen, số oxi hóa, Oxide cao nhất & Hydroxide tương ứng kèm tính chất hóa học đặc trưng!
+            </div>
+        </div>
+    </main>
+
+    <!-- Detail Modal -->
+    <div id="elementModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-slate-900 border border-slate-700 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300" id="modalContentBox">
+            <!-- Modal Header -->
+            <div id="modalHeaderBg" class="p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-slate-800 to-slate-900">
+                <div class="flex items-center space-x-4">
+                    <div id="modalSymbolBox" class="w-16 h-16 rounded-xl flex flex-col items-center justify-center font-bold text-2xl shadow-inner bg-indigo-600 text-white">
+                        <span id="mSymbol" class="text-2xl leading-none">H</span>
+                        <span id="mZ" class="text-[10px] font-normal opacity-80">Z = 1</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 id="mName" class="text-2xl font-bold text-white">Hydrogen</h2>
+                            <span id="mCategoryTag" class="px-2 py-0.5 text-xs rounded font-medium bg-slate-700 text-slate-300">Phi kim</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">Chu kì <span id="mPeriod">1</span> | Nhóm <span id="mGroup">1A</span> | Phân khối <span id="mBlock">s</span></p>
+                    </div>
+                </div>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body (Detailed attributes) -->
+            <div class="p-6 max-h-[70vh] overflow-y-auto space-y-4 text-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-slate-800/50 p-3.5 rounded-xl border border-slate-700/60">
+                        <span class="text-xs text-slate-400 block mb-1"><i class="fa-solid fa-weight-scale mr-1.5 text-indigo-400"></i> Nguyên tử khối trung bình</span>
+                        <span id="mMass" class="text-base font-semibold text-slate-200">1.008</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-3.5 rounded-xl border border-slate-700/60">
+                        <span class="text-xs text-slate-400 block mb-1"><i class="fa-solid fa-bolt mr-1.5 text-amber-400"></i> Độ âm điện (Pauling)</span>
+                        <span id="mElectronegativity" class="text-base font-semibold text-slate-200">2.20</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-3.5 rounded-xl border border-slate-700/60">
+                        <span class="text-xs text-slate-400 block mb-1"><i class="fa-solid fa-layer-group mr-1.5 text-cyan-400"></i> Cấu hình e lớp ngoài cùng</span>
+                        <span id="mConfig" class="text-base font-semibold text-cyan-300 font-mono">1s¹</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-3.5 rounded-xl border border-slate-700/60">
+                        <span class="text-xs text-slate-400 block mb-1"><i class="fa-solid fa-fire mr-1.5 text-red-400"></i> Hóa trị cao nhất với Oxygen</span>
+                        <span id="mValenceO" class="text-base font-semibold text-slate-200">I</span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/60">
+                    <h3 class="text-xs font-semibold uppercase tracking-wider text-indigo-400 mb-2"><i class="fa-solid fa-flask mr-1.5"></i> Tính chất hóa học đặc trưng</h3>
+                    <p id="mProperties" class="text-slate-300 leading-relaxed text-xs md:text-sm">...</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-slate-800/50 p-3.5 rounded-xl border border-slate-700/60">
+                        <span class="text-xs text-slate-400 block mb-1"><i class="fa-solid fa-arrows-split-up-and-left mr-1.5 text-purple-400"></i> Mức oxi hóa đặc trưng</span>
+                        <span id="mOxidation" class="text-sm font-semibold text-slate-200 font-mono">-1, 0, +1</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-3.5 rounded-xl border border-slate-700/60">
+                        <span class="text-xs text-slate-400 block mb-1"><i class="fa-solid fa-cube mr-1.5 text-emerald-400"></i> Oxide cao nhất</span>
+                        <span id="mHighestOxide" class="text-sm font-semibold text-emerald-300 font-mono">H₂O</span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/60">
+                    <h3 class="text-xs font-semibold uppercase tracking-wider text-emerald-400 mb-2"><i class="fa-solid fa-droplet mr-1.5"></i> Hydroxide tương ứng & Tính chất</h3>
+                    <p id="mHydroxide" class="text-slate-300 leading-relaxed text-xs md:text-sm">...</p>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 bg-slate-900 border-t border-slate-800 flex justify-end">
+                <button onclick="closeModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs rounded-lg transition shadow-md">Đóng bảng tra cứu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-auto py-4 text-center text-xs text-slate-500 border-t border-slate-900">
+        Bảng Tuần Hoàn Thông Minh 118 Nguyên Tố &copy; 2026 - Hóa học Phổ thông & Đại học.
+    </footer>
+
+    <!-- Script Data & Logic -->
+    <script>
+        // FULL 118 ELEMENTS DATABASE
+        const elementsData = [
+            // Period 1
+            { z: 1, symbol: "H", name: "Hydrogen", period: 1, group: "1A", block: "s", category: "nonmetal", mass: "1.008", config: "1s¹", electronegativity: "2.20", valenceO: "I", properties: "Khí không màu, nhẹ nhất, bốc cháy với oxy. Thể hiện tính khử mạnh với oxide kim loại.", oxidationStates: "-1, 0, +1", highestOxide: "H₂O (Oxide trung tính)", hydroxide: "H₂O (Nước - Trung tính)" },
+            { z: 2, symbol: "He", name: "Helium", period: 1, group: "8A", block: "s", category: "noble", mass: "4.0026", config: "1s²", electronegativity: "—", valenceO: "0", properties: "Khí hiếm đơn nguyên tử, trơ hoàn toàn về mặt hóa học.", oxidationStates: "0", highestOxide: "Không tạo oxide", hydroxide: "Không có" },
+
+            // Period 2
+            { z: 3, symbol: "Li", name: "Lithium", period: 2, group: "1A", block: "s", category: "alkali", mass: "6.94", config: "2s¹", electronegativity: "0.98", valenceO: "I", properties: "Kim loại kiềm mềm nhất, nhẹ nhất, tác dụng mạnh với nước giải phóng H₂. Tính khử rất mạnh.", oxidationStates: "0, +1", highestOxide: "Li₂O (Oxide bazo)", hydroxide: "LiOH (Bazo mạnh)" },
+            { z: 4, symbol: "Be", name: "Beryllium", period: 2, group: "2A", block: "s", category: "alkaline", mass: "9.0122", config: "2s²", electronegativity: "1.57", valenceO: "II", properties: "Kim loại kiềm thổ cứng, nhẹ, có tính lưỡng tính nhẹ (tan trong acid và dung dịch kiềm mạnh).", oxidationStates: "0, +2", highestOxide: "BeO (Oxide lưỡng tính)", hydroxide: "Be(OH)₂ (Hydroxide lưỡng tính)" },
+            { z: 5, symbol: "B", name: "Boron", period: 2, group: "3A", block: "p", category: "metalloid", mass: "10.81", config: "2s² 2p¹", electronegativity: "2.04", valenceO: "III", properties: "Á kim cứng, cấu trúc mạng tinh thể phức tạp, trơ hóa học ở nhiệt độ phòng.", oxidationStates: "0, +3", highestOxide: "B₂O₃ (Oxide acid yếu)", hydroxide: "H₃BO₃ (Acid boric yếu)" },
+            { z: 6, symbol: "C", name: "Carbon", period: 2, group: "4A", block: "p", category: "nonmetal", mass: "12.011", config: "2s² 2p²", electronegativity: "2.55", valenceO: "IV", properties: "Nền tảng của hợp chất hữu cơ. Thể hiện cả tính khử (cháy tạo CO₂) và tính oxi hóa (tác dụng kim loại).", oxidationStates: "-4, -2, 0, +2, +4", highestOxide: "CO₂ (Oxide acid)", hydroxide: "H₂CO₃ (Acid carbonic yếu, không bền)" },
+            { z: 7, symbol: "N", name: "Nitrogen", period: 2, group: "5A", block: "p", category: "nonmetal", mass: "14.007", config: "2s² 2p³", electronegativity: "3.04", valenceO: "V", properties: "Khí trơ ở nhiệt độ thường do liên kết ba N≡N bền vững. Ở nhiệt độ cao thể hiện tính oxi hóa và khử.", oxidationStates: "-3, -2, -1, 0, +1, +2, +3, +4, +5", highestOxide: "N₂O₅ (Oxide acid)", hydroxide: "HNO₃ (Acid nitric mạnh)" },
+            { z: 8, symbol: "O", name: "Oxygen", period: 2, group: "6A", block: "p", category: "nonmetal", mass: "15.999", config: "2s² 2p⁴", electronegativity: "3.44", valenceO: "VI", properties: "Phi kim duy trì sự cháy và sự sống. Tính oxi hóa rất mạnh, tác dụng hầu hết kim loại và phi kim.", oxidationStates: "-2, -1, 0, +1, +2", highestOxide: "O₂ / O₃ (Chính nó)", hydroxide: "Không tạo hydroxide" },
+            { z: 9, symbol: "F", name: "Fluorine", period: 2, group: "7A", block: "p", category: "halogen", mass: "18.998", config: "2s² 2p⁵", electronegativity: "3.98", valenceO: "—", properties: "Phi kim mạnh nhất, độ âm điện lớn nhất. Oxi hóa được hầu hết các chất kể cả nước sôi.", oxidationStates: "-1, 0", highestOxide: "OF₂ (Oxygen difluoride)", hydroxide: "Không tạo hydroxide" },
+            { z: 10, symbol: "Ne", name: "Neon", period: 2, group: "8A", block: "p", category: "noble", mass: "20.180", config: "2s² 2p⁶", electronegativity: "—", valenceO: "0", properties: "Khí hiếm trơ hoàn toàn, phát sáng đỏ cam trong ống phóng điện.", oxidationStates: "0", highestOxide: "Không có", hydroxide: "Không có" },
+
+            // Period 3
+            { z: 11, symbol: "Na", name: "Sodium", period: 3, group: "1A", block: "s", category: "alkali", mass: "22.990", config: "3s¹", electronegativity: "0.93", valenceO: "I", properties: "Kim loại kiềm mềm, phản ứng mãnh liệt với nước tạo dung dịch kiềm kiềm bazo và H₂. Tính khử mạnh.", oxidationStates: "0, +1", highestOxide: "Na₂O (Oxide bazo)", hydroxide: "NaOH (Bazo mạnh - Xút ăn da)" },
+            { z: 12, symbol: "Mg", name: "Magnesium", period: 3, group: "2A", block: "s", category: "alkaline", mass: "24.305", config: "3s²", electronegativity: "1.31", valenceO: "II", properties: "Kim loại nhẹ, cháy sáng ngọn lửa trắng trong không khí. Tác dụng chậm với nước lạnh, nhanh với nước nóng.", oxidationStates: "0, +2", highestOxide: "MgO (Oxide bazo)", hydroxide: "Mg(OH)₂ (Bazo yếu, ít tan)" },
+            { z: 13, symbol: "Al", name: "Aluminum", period: 3, group: "3A", block: "p", category: "post-transition", mass: "26.982", config: "3s² 3p¹", electronegativity: "1.61", valenceO: "III", properties: "Kim loại nhẹ, dẫn điện tốt, có màng oxide bảo vệ bền vững. Tính chất lưỡng tính (tan trong acid và kiềm).", oxidationStates: "0, +3", highestOxide: "Al₂O₃ (Oxide lưỡng tính)", hydroxide: "Al(OH)₃ (Hydroxide lưỡng tính)" },
+            { z: 14, symbol: "Si", name: "Silicon", period: 3, group: "4A", block: "p", category: "metalloid", mass: "28.085", config: "3s² 3p²", electronegativity: "1.90", valenceO: "IV", properties: "Á kim bán dẫn. Trơ ở nhiệt độ thường, tan trong dung dịch kiềm đặc giải phóng H₂.", oxidationStates: "-4, 0, +2, +4", highestOxide: "SiO₂ (Oxide acid)", hydroxide: "H₂SiO₃ (Acid silicic yếu, không tan)" },
+            { z: 15, symbol: "P", name: "Phosphorus", period: 3, group: "5A", block: "p", category: "nonmetal", mass: "30.974", config: "3s² 3p³", electronegativity: "2.19", valenceO: "V", properties: "Có thù hình photpho trắng (dễ tự cháy) và đỏ. Thể hiện tính oxi hóa và tính khử.", oxidationStates: "-3, 0, +3, +5", highestOxide: "P₂O₅ (Oxide acid)", hydroxide: "H₃PO₄ (Acid phosphoric nấc trung bình)" },
+            { z: 16, symbol: "S", name: "Sulfur", period: 3, group: "6A", block: "p", category: "nonmetal", mass: "32.06", config: "3s² 3p⁴", electronegativity: "2.58", valenceO: "VI", properties: "Phi kim vàng rắn. Thể hiện tính khử khi tác dụng với O₂, HNO₃ và tính oxi hóa khi tác dụng H₂, kim loại.", oxidationStates: "-2, 0, +4, +6", highestOxide: "SO₃ (Oxide acid)", hydroxide: "H₂SO₄ (Acid sulfuric mạnh)" },
+            { z: 17, symbol: "Cl", name: "Chlorine", period: 3, group: "7A", block: "p", category: "halogen", mass: "35.45", config: "3s² 3p⁵", electronegativity: "3.16", valenceO: "VII", properties: "Khí vàng lục, độc, tính oxi hóa rất mạnh. Tác dụng hầu hết kim loại và hydrogen.", oxidationStates: "-1, 0, +1, +3, +5, +7", highestOxide: "Cl₂O₇ (Oxide acid)", hydroxide: "HClO₄ (Acid perchloric cực mạnh)" },
+            { z: 18, symbol: "Ar", name: "Argon", period: 3, group: "8A", block: "p", category: "noble", mass: "39.95", config: "3s² 3p⁶", electronegativity: "—", valenceO: "0", properties: "Khí hiếm trơ tuyệt đối ở điều kiện thường, ứng dụng trong hàn khí bảo vệ.", oxidationStates: "0", highestOxide: "Không có", hydroxide: "Không có" },
+
+            // Period 4
+            { z: 19, symbol: "K", name: "Potassium", period: 4, group: "1A", block: "s", category: "alkali", mass: "39.098", config: "4s¹", electronegativity: "0.82", valenceO: "I", properties: "Kim loại kiềm cực mạnh, bốc cháy khi ném vào nước. Tính khử rất lớn.", oxidationStates: "0, +1", highestOxide: "K₂O (Oxide bazo)", hydroxide: "KOH (Bazo cực mạnh)" },
+            { z: 20, symbol: "Ca", name: "Calcium", period: 4, group: "2A", block: "s", category: "alkaline", mass: "40.078", config: "4s²", electronegativity: "1.00", valenceO: "II", properties: "Kim loại kiềm thổ, tác dụng mạnh với nước ở nhiệt độ phòng giải phóng H₂.", oxidationStates: "0, +2", highestOxide: "CaO (Oxide bazo)", hydroxide: "Ca(OH)₂ (Bazo vừa phải, ít tan)" },
+            { z: 21, symbol: "Sc", name: "Scandium", period: 4, group: "3B", block: "d", category: "transition", mass: "44.956", config: "3d¹ 4s²", electronegativity: "1.36", valenceO: "III", properties: "Kim loại chuyển tiếp nhẹ, tan dễ trong acid tạo dung dịch muối Sc³⁺.", oxidationStates: "0, +3", highestOxide: "Sc₂O₃ (Oxide bazo)", hydroxide: "Sc(OH)₃ (Bazo yếu)" },
+            { z: 22, symbol: "Ti", name: "Titanium", period: 4, group: "4B", block: "d", category: "transition", mass: "47.867", config: "3d² 4s²", electronegativity: "1.54", valenceO: "IV", properties: "Kim loại siêu bền, nhẹ, chống ăn mòn hóa học cực tốt kể cả trong nước biển.", oxidationStates: "+2, +3, +4", highestOxide: "TiO₂ (Oxide lưỡng tính)", hydroxide: "Ti(OH)₄" },
+            { z: 23, symbol: "V", name: "Vanadium", period: 4, group: "5B", block: "d", category: "transition", mass: "50.942", config: "3d³ 4s²", electronegativity: "1.63", valenceO: "V", properties: "Kim loại chuyển tiếp có nhiều số oxi hóa phong phú, oxide V₂O₅ là xúc tác quan trọng.", oxidationStates: "+2, +3, +4, +5", highestOxide: "V₂O₅ (Oxide lưỡng tính)", hydroxide: "HVO₃ (Acid vanadic)" },
+            { z: 24, symbol: "Cr", name: "Chromium", period: 4, group: "6B", block: "d", category: "transition", mass: "51.996", config: "3d⁵ 4s¹", electronegativity: "1.66", valenceO: "VI", properties: "Kim loại cứng nhất. CrO₃ là oxide acid cực mạnh, hợp chất Cr(VI) có tính oxi hóa rất cao.", oxidationStates: "+2, +3, +6", highestOxide: "CrO₃ (Oxide acid)", hydroxide: "H₂CrO₄ / H₂Cr₂O₇ (Acid mạnh)" },
+            { z: 25, symbol: "Mn", name: "Manganese", period: 4, group: "7B", block: "d", category: "transition", mass: "54.938", config: "3d⁵ 4s²", electronegativity: "1.55", valenceO: "VII", properties: "Kim loại cứng giòn. Các hợp chất Mn(VII) như KMnO₄ có tính oxi hóa cực kỳ mãnh liệt.", oxidationStates: "+2, +3, +4, +6, +7", highestOxide: "Mn₂O₇ (Oxide acid)", hydroxide: "HMnO₄ (Acid permanganic)" },
+            { z: 26, symbol: "Fe", name: "Iron", period: 4, group: "8B", block: "d", category: "transition", mass: "55.845", config: "3d⁶ 4s²", electronegativity: "1.83", valenceO: "III", properties: "Kim loại từ tính phổ biến nhất. Dễ bị ăn mòn rỉ sét trong không khí ẩm, có hóa trị II và III.", oxidationStates: "0, +2, +3, +6", highestOxide: "Fe₂O₃ (Oxide bazo)", hydroxide: "Fe(OH)₃ (Hydroxide bazo yếu)" },
+            { z: 27, symbol: "Co", name: "Cobalt", period: 4, group: "8B", block: "d", category: "transition", mass: "58.933", config: "3d⁷ 4s²", electronegativity: "1.88", valenceO: "III", properties: "Kim loại sắt từ, bền trong không khí, ứng dụng trong nam quặng và pin Lithium-ion.", oxidationStates: "+2, +3", highestOxide: "Co₂O₃ (Oxide bazo)", hydroxide: "Co(OH)₃" },
+            { z: 28, symbol: "Ni", name: "Nickel", period: 4, group: "8B", block: "d", category: "transition", mass: "58.693", config: "3d⁸ 4s²", electronegativity: "1.91", valenceO: "II", properties: "Kim loại màu trắng bạc, chống ăn mòn cao, dùng mạ bảo vệ và hợp kim inox.", oxidationStates: "+2, +3", highestOxide: "NiO (Oxide bazo)", hydroxide: "Ni(OH)₂ (Bazo yếu)" },
+            { z: 29, symbol: "Cu", name: "Copper", period: 4, group: "1B", block: "d", category: "transition", mass: "63.546", config: "3d¹⁰ 4s¹", electronegativity: "1.90", valenceO: "II", properties: "Kim loại màu đỏ, dẫn điện/nhiệt xuất sắc. Tác dụng acid có tính oxi hóa mạnh như HNO₃, H₂SO₄ đặc.", oxidationStates: "+1, +2", highestOxide: "CuO (Oxide bazo)", hydroxide: "Cu(OH)₂ (Bazo không tan, kết tủa xanh)" },
+            { z: 30, symbol: "Zn", name: "Zinc", period: 4, group: "2B", block: "d", category: "transition", mass: "65.38", config: "3d¹⁰ 4s²", electronegativity: "1.65", valenceO: "II", properties: "Kim loại có tính lưỡng tính. ZnO và Zn(OH)₂ đều tan trong dung dịch acid và kiềm mạnh.", oxidationStates: "0, +2", highestOxide: "ZnO (Oxide lưỡng tính)", hydroxide: "Zn(OH)₂ (Hydroxide lưỡng tính)" },
+            { z: 31, symbol: "Ga", name: "Gallium", period: 4, group: "3A", block: "p", category: "post-transition", mass: "69.723", config: "4s² 4p¹", electronegativity: "1.81", valenceO: "III", properties: "Kim loại nóng chảy ngay ở nhiệt độ bàn tay (~29.7°C), thể hiện tính lưỡng tính.", oxidationStates: "+3", highestOxide: "Ga₂O₃ (Oxide lưỡng tính)", hydroxide: "Ga(OH)₃" },
+            { z: 32, symbol: "Ge", name: "Germanium", period: 4, group: "4A", block: "p", category: "metalloid", mass: "72.630", config: "4s² 4p²", electronegativity: "2.01", valenceO: "IV", properties: "Á kim bán dẫn quan trọng cùng nhóm với Carbon và Silicon.", oxidationStates: "+2, +4", highestOxide: "GeO₂ (Oxide acid)", hydroxide: "H₂GeO₃" },
+            { z: 33, symbol: "As", name: "Arsenic", period: 4, group: "5A", block: "p", category: "metalloid", mass: "74.922", config: "4s² 4p³", electronegativity: "2.18", valenceO: "V", properties: "Á kim độc, tạo hợp chất thạch tín (As₂O₃). Tác dụng mạnh với phi kim và acid oxi hóa mạnh.", oxidationStates: "-3, +3, +5", highestOxide: "As₂O₅ (Oxide acid)", hydroxide: "H₃AsO₄ (Acid arsenic)" },
+            { z: 34, symbol: "Se", name: "Selenium", period: 4, group: "6A", block: "p", category: "nonmetal", mass: "78.971", config: "4s² 4p⁴", electronegativity: "2.55", valenceO: "VI", properties: "Phi kim có tính quang dẫn tốt, tạo acid selenic H₂SeO₄ có tính oxi hóa rất mạnh.", oxidationStates: "-2, +4, +6", highestOxide: "SeO₃ (Oxide acid)", hydroxide: "H₂SeO₄ (Acid selenic)" },
+            { z: 35, symbol: "Br", name: "Bromine", period: 4, group: "7A", block: "p", category: "halogen", mass: "79.904", config: "4s² 4p⁵", electronegativity: "2.96", valenceO: "VII", properties: "Halogen duy nhất ở dạng lỏng ở điều kiện thường, bốc hơi màu đỏ nâu độc hại. Tính oxi hóa mạnh.", oxidationStates: "-1, 0, +1, +3, +5, +7", highestOxide: "Br₂O₇ (Oxide acid)", hydroxide: "HBrO₄ (Acid perbromic)" },
+            { z: 36, symbol: "Kr", name: "Krypton", period: 4, group: "8A", block: "p", category: "noble", mass: "83.798", config: "4s² 4p⁶", electronegativity: "3.00", valenceO: "0", properties: "Khí hiếm hiếm khi phản ứng, tạo một số ít hợp chất bền với Fluorine ở điều kiện khắc nghiệt.", oxidationStates: "0, +2", highestOxide: "Không có", hydroxide: "Không có" },
+
+            // Period 5
+            { z: 37, symbol: "Rb", name: "Rubidium", period: 5, group: "1A", block: "s", category: "alkali", mass: "85.468", config: "5s¹", electronegativity: "0.82", valenceO: "I", properties: "Kim loại kiềm rất tự bốc cháy ngoài không khí và nổ mãnh liệt với nước.", oxidationStates: "0, +1", highestOxide: "Rb₂O (Oxide bazo)", hydroxide: "RbOH (Bazo cực mạnh)" },
+            { z: 38, symbol: "Sr", name: "Strontium", period: 5, group: "2A", block: "s", category: "alkaline", mass: "87.62", config: "5s²", electronegativity: "0.95", valenceO: "II", properties: "Kim loại kiềm thổ phản ứng mạnh với nước, ngọn lửa cháy màu đỏ son đẹp mắt.", oxidationStates: "0, +2", highestOxide: "SrO (Oxide bazo)", hydroxide: "Sr(OH)₂ (Bazo mạnh)" },
+            { z: 39, symbol: "Y", name: "Yttrium", period: 5, group: "3B", block: "d", category: "transition", mass: "88.906", config: "4d¹ 5s²", electronegativity: "1.22", valenceO: "III", properties: "Kim loại chuyển tiếp bạc trắng, dùng chế tạo chất phát quang TV và laser YAG.", oxidationStates: "+3", highestOxide: "Y₂O₃", hydroxide: "Y(OH)₃" },
+            { z: 40, symbol: "Zr", name: "Zirconium", period: 5, group: "4B", block: "d", category: "transition", mass: "91.224", config: "4d² 5s²", electronegativity: "1.33", valenceO: "IV", properties: "Chống ăn mòn tuyệt vời, dùng bọc thanh nhiên liệu hạt nhân lò phản ứng.", oxidationStates: "+4", highestOxide: "ZrO₂ (Oxide lưỡng tính)", hydroxide: "Zr(OH)₄" },
+            { z: 41, symbol: "Nb", name: "Niobium", period: 5, group: "5B", block: "d", category: "transition", mass: "92.906", config: "4d⁴ 5s¹", electronegativity: "1.6", valenceO: "V", properties: "Kim loại siêu dẫn ở nhiệt độ thấp, chịu nhiệt cao.", oxidationStates: "+3, +5", highestOxide: "Nb₂O₅", hydroxide: "HNbO₃" },
+            { z: 42, symbol: "Mo", name: "Molybdenum", period: 5, group: "6B", block: "d", category: "transition", mass: "95.95", config: "4d⁵ 5s¹", electronegativity: "2.16", valenceO: "VI", properties: "Nhiệt độ nóng chảy rất cao, làm tăng độ cứng cho thép hợp kim.", oxidationStates: "+4, +6", highestOxide: "MoO₃ (Oxide acid)", hydroxide: "H₂MoO₄" },
+            { z: 43, symbol: "Tc", name: "Technetium", period: 5, group: "7B", block: "d", category: "transition", mass: "98", config: "4d⁵ 5s²", electronegativity: "1.9", valenceO: "VII", properties: "Nguyên tố phóng xạ nhân tạo đầu tiên được tổng hợp, ứng dụng y học hạt nhân.", oxidationStates: "+4, +7", highestOxide: "Tc₂O₇", hydroxide: "HTcO₄" },
+            { z: 44, symbol: "Ru", name: "Ruthenium", period: 5, group: "8B", block: "d", category: "transition", mass: "101.07", config: "4d⁷ 5s¹", electronegativity: "2.2", valenceO: "VIII", properties: "Kim loại hiếm họ platin, đạt tới số oxi hóa +8 trong RuO₄.", oxidationStates: "+3, +4, +8", highestOxide: "RuO₄ (Chất oxi hóa mạnh)", hydroxide: "H₂RuO₄" },
+            { z: 45, symbol: "Rh", name: "Rhodium", period: 5, group: "8B", block: "d", category: "transition", mass: "102.91", config: "4d⁸ 5s¹", electronegativity: "2.28", valenceO: "VI", properties: "Kim loại cực kỳ đắt tiền, xúc tác chuyển đổi khí thải ô tô xuất sắc.", oxidationStates: "+3", highestOxide: "Rh₂O₃", hydroxide: "Rh(OH)₃" },
+            { z: 46, symbol: "Pd", name: "Palladium", period: 5, group: "8B", block: "d", category: "transition", mass: "106.42", config: "4d¹⁰", electronegativity: "2.20", valenceO: "IV", properties: "Hấp thụ khí Hydrogen gấp 900 lần thể tích bản thân, xúc tác hữu cơ tuyệt vời.", oxidationStates: "+2, +4", highestOxide: "PdO", hydroxide: "Pd(OH)₂" },
+            { z: 47, symbol: "Ag", name: "Silver", period: 5, group: "1B", block: "d", category: "transition", mass: "107.87", config: "4d¹⁰ 5s¹", electronegativity: "1.93", valenceO: "I", properties: "Kim loại dẫn điện và dẫn nhiệt tốt nhất. Dễ kết hợp với lưu huỳnh bị đen ngoài không khí.", oxidationStates: "+1", highestOxide: "Ag₂O (Oxide bazo)", hydroxide: "AgOH (Chuyển thành Ag₂O + H₂O)" },
+            { z: 48, symbol: "Cd", name: "Cadmium", period: 5, group: "2B", block: "d", category: "transition", mass: "112.41", config: "4d¹⁰ 5s²", electronegativity: "1.69", valenceO: "II", properties: "Kim loại màu trắng xanh độc hại, dùng trong pin Ni-Cd.", oxidationStates: "+2", highestOxide: "CdO (Oxide bazo)", hydroxide: "Cd(OH)₂" },
+            { z: 49, symbol: "In", name: "Indium", period: 5, group: "3A", block: "p", category: "post-transition", mass: "114.82", config: "5s² 5p¹", electronegativity: "1.78", valenceO: "III", properties: "Kim loại rất mềm, làm màn hình cảm ứng ITO (Indium Tin Oxide).", oxidationStates: "+3", highestOxide: "In₂O₃", hydroxide: "In(OH)₃" },
+            { z: 50, symbol: "Sn", name: "Tin (Thiếc)", period: 5, group: "4A", block: "p", category: "post-transition", mass: "118.71", config: "5s² 5p²", electronegativity: "1.96", valenceO: "IV", properties: "Kim loại mềm dẻo chống gỉ, dùng hàn chì và tráng thép mạ thiếc (sắt tây). Tính lưỡng tính.", oxidationStates: "+2, +4", highestOxide: "SnO₂ (Oxide lưỡng tính)", hydroxide: "Sn(OH)₄" },
+            { z: 51, symbol: "Sb", name: "Antimony", period: 5, group: "5A", block: "p", category: "metalloid", mass: "121.76", config: "5s² 5p³", electronegativity: "2.05", valenceO: "V", properties: "Á kim giòn, tăng độ cứng cho hợp kim chì đạn và ắc quy.", oxidationStates: "-3, +3, +5", highestOxide: "Sb₂O₅ (Oxide acid)", hydroxide: "HSbO₃" },
+            { z: 52, symbol: "Te", name: "Tellurium", period: 5, group: "6A", block: "p", category: "metalloid", mass: "127.60", config: "5s² 5p⁴", electronegativity: "2.1", valenceO: "VI", properties: "Á kim bán dẫn màu xám bạc, độc tính cao.", oxidationStates: "-2, +4, +6", highestOxide: "TeO₃", hydroxide: "H₂TeO₄" },
+            { z: 53, symbol: "I", name: "Iodine", period: 5, group: "7A", block: "p", category: "halogen", mass: "126.90", config: "5s² 5p⁵", electronegativity: "2.66", valenceO: "VII", properties: "Halogen tinh thể đen tím thăng hoa thành hơi màu tím. Tính oxi hóa kém hơn Cl₂ và Br₂.", oxidationStates: "-1, 0, +1, +5, +7", highestOxide: "I₂O₅ (Oxide acid)", hydroxide: "HIO₄ (Acid periodic)" },
+            { z: 54, symbol: "Xe", name: "Xenon", period: 5, group: "8A", block: "p", category: "noble", mass: "131.29", config: "5s² 5p⁶", electronegativity: "2.6", valenceO: "VIII", properties: "Khí hiếm nặng, có thể phản ứng với Fluorine và Oxygen tạo hợp chất bền như XeF₄, XeO₃.", oxidationStates: "0, +2, +4, +6, +8", highestOxide: "XeO₄", hydroxide: "H₄XeO₆" },
+
+            // Period 6
+            { z: 55, symbol: "Cs", name: "Caesium", period: 6, group: "1A", block: "s", category: "alkali", mass: "132.91", config: "6s¹", electronegativity: "0.79", valenceO: "I", properties: "Kim loại kiềm hoạt động mạnh nhất trong các nguyên tố bền. Nóng chảy ở 28.5°C, đồng hồ nguyên tử.", oxidationStates: "0, +1", highestOxide: "Cs₂O (Oxide bazo)", hydroxide: "CsOH (Bazo mạnh nhất)" },
+            { z: 56, symbol: "Ba", name: "Barium", period: 6, group: "2A", block: "s", category: "alkaline", mass: "137.33", config: "6s²", electronegativity: "0.89", valenceO: "II", properties: "Kim loại kiềm thổ phản ứng rất mãnh liệt với nước. Muối BaSO₄ không tan cản quang X-quang.", oxidationStates: "0, +2", highestOxide: "BaO (Oxide bazo)", hydroxide: "Ba(OH)₂ (Bazo mạnh)" },
+            
+            // Lanthanides (57-71) - mapped in row separately
+            { z: 57, symbol: "La", name: "Lanthanum", period: 6, group: "3B", block: "f", category: "lanthanide", mass: "138.91", config: "5d¹ 6s²", electronegativity: "1.10", valenceO: "III", properties: "Nguyên tố mở đầu chuỗi Lantan, kim loại màu bạc mềm, bị oxi hóa nhanh trong không khí.", oxidationStates: "+3", highestOxide: "La₂O₃", hydroxide: "La(OH)₃" },
+            { z: 58, symbol: "Ce", name: "Cerium", period: 6, group: "3B", block: "f", category: "lanthanide", mass: "140.12", config: "4f¹ 5d¹ 6s²", electronegativity: "1.12", valenceO: "IV", properties: "Lantan phổ biến nhất, oxide CeO₂ dùng đánh bóng kính và xúc tác ống xả.", oxidationStates: "+3, +4", highestOxide: "CeO₂", hydroxide: "Ce(OH)₄" },
+            { z: 59, symbol: "Pr", name: "Praseodymium", period: 6, group: "3B", block: "f", category: "lanthanide", mass: "140.91", config: "4f³ 6s²", electronegativity: "1.13", valenceO: "III", properties: "Kim loại đất hiếm dùng nhuộm thủy tinh màu vàng-xanh lục.", oxidationStates: "+3, +4", highestOxide: "Pr₆O₁₁", hydroxide: "Pr(OH)₃" },
+            { z: 60, symbol: "Nd", name: "Neodymium", period: 6, group: "3B", block: "f", category: "lanthanide", mass: "144.24", config: "4f⁴ 6s²", electronegativity: "1.14", valenceO: "III", properties: "Tạo nên nam châm vĩnh cửu siêu mạnh NdFeB dùng trong tai nghe, xe điện.", oxidationStates: "+3", highestOxide: "Nd₂O₃", hydroxide: "Nd(OH)₃" },
+            { z: 61, symbol: "Pm", name: "Promethium", period: 6, group: "3B", block: "f", category: "lanthanide", mass: "145", config: "4f⁵ 6s²", electronegativity: "1.13", valenceO: "III", properties: "Nguyên tố phóng xạ duy nhất trong họ Lantan, dùng trong pin hạt nhân nhỏ.", oxidationStates: "+3", highestOxide: "Pm₂O₃", hydroxide: "Pm(OH)₃" },
+            { z: 62, symbol: "Sm", name: "Samarium", period: 6, group: "3B", block: "f", category: "lanthanide", mass: "150.36", config: "4f⁶ 6s²", electronegativity: "1.17", valenceO: "III", properties: "Chế tạo nam châm Samarium-Cobalt chịu nhiệt độ cực cao.", oxidationStates: "+2, +3", highestOxide: "Sm₂O₃", hydroxide: "Sm(OH)₃" },
+            { z: 63, symbol: "Eu", name: "Europium", period: 6, group: "3B", block: "f", category: "lanthanide", mass: "151.96", config: "4f⁷ 6s²", electronegativity: "1.20", valenceO: "III", properties: "Nguyên tố đất hiếm phản ứng hóa học mạnh nhất, tạo màu đỏ cho màn hình huỳnh quang.", oxidationStates: "+2, +3", highestOxide: "Eu₂O₃", hydroxide: "Eu(OH)₃" },
+            { z: 64, symbol: "Gd", name: "Gadolinium", period: 6, group: "3B", block: "f", category: "lanthanide", mass: "157.25", config: "4f⁷ 5d¹ 6s²", electronegativity: "1.20", valenceO: "III", properties: "Có đặc tính từ tính độc đáo, làm chất tương phản trong chụp cộng hưởng từ MRI.", oxidationStates: "+3", highestOxide: "Gd₂O₃", hydroxide: "Gd(OH)₃" },
+            { z: 65, symbol: "Tb", name: "Terbium", period: 6, group: "3B", block: "f", category: "lanthanide", mass: "158.93", config: "4f⁹ 6s²", electronegativity: "1.20", valenceO: "III", properties: "Phát ánh sáng huỳnh quang xanh lá cây, dùng trong đèn tiết kiệm điện.", oxidationStates: "+3, +4", highestOxide: "Tb₄O₇", hydroxide: "Tb(OH)₃" },
+            { z: 66, symbol: "Dy", name: "Dysprosium", period: 6, group: "3B", block: "f", category: "lanthanide", mass: "162.50", config: "4f¹⁰ 6s²", electronegativity: "1.22", valenceO: "III", properties: "Độ nhiễm từ rất cao, bổ sung vào nam châm NdFeB để giữ từ tính ở nhiệt độ cao.", oxidationStates: "+3", highestOxide: "Dy₂O₃", hydroxide: "Dy(OH)₃" },
+            { z: 67, symbol: "Ho", name: "Holmium", period: 6, group: "3B", block: "f", category: "lanthanide", mass: "164.93", config: "4f¹¹ 6s²", electronegativity: "1.23", valenceO: "III", properties: "Có mômen từ cao nhất trong các nguyên tố tự nhiên, ứng dụng trong laser y tế.", oxidationStates: "+3", highestOxide: "Ho₂O₃", hydroxide: "Ho(OH)₃" },
+            { z: 68, symbol: "Er", name: "Erbium", period: 6, group: "3B", block: "f", category: "lanthanide", mass: "167.26", config: "4f¹² 6s²", electronegativity: "1.24", valenceO: "III", properties: "Pha tạp trong sợi cáp quang để khuếch đại tín hiệu laser truyền thông internet.", oxidationStates: "+3", highestOxide: "Er₂O₃", hydroxide: "Er(OH)₃" },
+            { z: 69, symbol: "Tm", name: "Thulium", period: 6, group: "3B", block: "f", category: "lanthanide", mass: "168.93", config: "4f¹³ 6s²", electronegativity: "1.25", valenceO: "III", properties: "Nguyên tố hiếm nhất trong họ Lantan, dùng trong máy X-quang di động.", oxidationStates: "+2, +3", highestOxide: "Tm₂O₃", hydroxide: "Tm(OH)₃" },
+            { z: 70, symbol: "Yb", name: "Ytterbium", period: 6, group: "3B", block: "f", category: "lanthanide", mass: "173.05", config: "4f¹⁴ 6s²", electronegativity: "1.10", valenceO: "III", properties: "Dùng làm đồng hồ nguyên tử độ chính xác cao và laser đục lỗ.", oxidationStates: "+2, +3", highestOxide: "Yb₂O₃", hydroxide: "Yb(OH)₃" },
+            { z: 71, symbol: "Lu", name: "Lutetium", period: 6, group: "3B", block: "f", category: "lanthanide", mass: "174.97", config: "4f¹⁴ 5d¹ 6s²", electronegativity: "1.27", valenceO: "III", properties: "Nguyên tố cuối cùng họ Lantan, cứng nhất và khối lượng riêng cao nhất nhóm.", oxidationStates: "+3", highestOxide: "Lu₂O₃", hydroxide: "Lu(OH)₃" },
+
+            // Period 6 Transition Metals & Post-Transition
+            { z: 72, symbol: "Hf", name: "Hafnium", period: 6, group: "4B", block: "d", category: "transition", mass: "178.49", config: "5d² 6s²", electronegativity: "1.3", valenceO: "IV", properties: "Hấp thụ neutron tuyệt vời, làm thanh khống chế trong tàu ngầm hạt nhân.", oxidationStates: "+4", highestOxide: "HfO₂", hydroxide: "Hf(OH)₄" },
+            { z: 73, symbol: "Ta", name: "Tantalum", period: 6, group: "5B", block: "d", category: "transition", mass: "180.95", config: "5d³ 6s²", electronegativity: "1.5", valenceO: "V", properties: "Trơ hóa học hoàn toàn với dịch cơ thể, làm tụ điện vi mô điện thoại và khớp nhân tạo.", oxidationStates: "+5", highestOxide: "Ta₂O₅", hydroxide: "HTaO₃" },
+            { z: 74, symbol: "W", name: "Tungsten (Volfram)", period: 6, group: "6B", block: "d", category: "transition", mass: "183.84", config: "5d⁴ 6s²", electronegativity: "2.36", valenceO: "VI", properties: "Nhiệt độ nóng chảy cao nhất trong các kim loại (3422°C), dây tóc bóng đèn.", oxidationStates: "+4, +6", highestOxide: "WO₃ (Oxide acid)", hydroxide: "H₂WO₄" },
+            { z: 75, symbol: "Re", name: "Rhenium", period: 6, group: "7B", block: "d", category: "transition", mass: "186.21", config: "5d⁵ 6s²", electronegativity: "1.9", valenceO: "VII", properties: "Kim loại hiếm chịu nhiệt độ siêu cao trong động cơ phản lực hàng không.", oxidationStates: "+4, +7", highestOxide: "Re₂O₇", hydroxide: "HReO₄" },
+            { z: 76, symbol: "Os", name: "Osmium", period: 6, group: "8B", block: "d", category: "transition", mass: "190.23", config: "5d⁶ 6s²", electronegativity: "2.2", valenceO: "VIII", properties: "Chất có khối lượng riêng lớn nhất (22.59 g/cm³). Tạc oxide OsO₄ cực độc.", oxidationStates: "+4, +8", highestOxide: "OsO₄ (Chất oxi hóa mạnh)", hydroxide: "H₂OsO₄" },
+            { z: 77, symbol: "Ir", name: "Iridium", period: 6, group: "8B", block: "d", category: "transition", mass: "192.22", config: "5d⁷ 6s²", electronegativity: "2.20", valenceO: "VI", properties: "Kim loại chống ăn mòn hóa học tốt nhất, làm bugi đánh lửa siêu bền.", oxidationStates: "+3, +4", highestOxide: "IrO₂", hydroxide: "Ir(OH)₄" },
+            { z: 78, symbol: "Pt", name: "Platinum (Bạch kim)", period: 6, group: "8B", block: "d", category: "transition", mass: "195.08", config: "5d⁹ 6s¹", electronegativity: "2.28", valenceO: "IV", properties: "Kim loại quý trơ cao, xúc tác công nghiệp hóa chất và trang sức cao cấp.", oxidationStates: "+2, +4", highestOxide: "PtO₂", hydroxide: "Pt(OH)₄" },
+            { z: 79, symbol: "Au", name: "Gold (Vàng)", period: 6, group: "1B", block: "d", category: "transition", mass: "196.97", config: "5d¹⁰ 6s¹", electronegativity: "2.54", valenceO: "III", properties: "Kim loại quý trơ không gỉ sét. Chỉ bị hòa tan bởi dung dịch nước cường toan (HNO₃ + 3HCl).", oxidationStates: "+1, +3", highestOxide: "Au₂O₃ (Oxide lưỡng tính)", hydroxide: "Au(OH)₃" },
+            { z: 80, symbol: "Hg", name: "Mercury (Thủy ngân)", period: 6, group: "2B", block: "d", category: "transition", mass: "200.59", config: "5d¹⁰ 6s²", electronegativity: "2.00", valenceO: "II", properties: "Kim loại duy nhất dạng lỏng ở nhiệt độ phòng. Hơi thủy ngân cực kỳ độc hại đối với thần kinh.", oxidationStates: "+1, +2", highestOxide: "HgO (Oxide bazo)", hydroxide: "Hg(OH)₂ (Phân hủy thành HgO)" },
+            { z: 81, symbol: "Tl", name: "Thallium", period: 6, group: "3A", block: "p", category: "post-transition", mass: "204.38", config: "6s² 6p¹", electronegativity: "1.62", valenceO: "III", properties: "Kim loại rất độc, từng dùng làm thuốc chuột.", oxidationStates: "+1, +3", highestOxide: "Tl₂O₃", hydroxide: "Tl(OH)₃" },
+            { z: 82, symbol: "Pb", name: "Lead (Chì)", period: 6, group: "4A", block: "p", category: "post-transition", mass: "207.2", config: "6s² 6p²", electronegativity: "2.33", valenceO: "IV", properties: "Kim loại nặng, mềm, chắn tia phóng xạ Gamma. Độc tính tích tụ sinh học.", oxidationStates: "+2, +4", highestOxide: "PbO₂ (Oxide lưỡng tính)", hydroxide: "Pb(OH)₂" },
+            { z: 83, symbol: "Bi", name: "Bismuth", period: 6, group: "5A", block: "p", category: "post-transition", mass: "208.98", config: "6s² 6p³", electronegativity: "2.02", valenceO: "V", properties: "Kim loại nặng duy nhất hầu như không độc hại, tinh thể có màu cầu vồng khi bị oxi hóa.", oxidationStates: "+3, +5", highestOxide: "Bi₂O₅", hydroxide: "Bi(OH)₃" },
+            { z: 84, symbol: "Po", name: "Polonium", period: 6, group: "6A", block: "p", category: "post-transition", mass: "209", config: "6s² 6p⁴", electronegativity: "2.0", valenceO: "VI", properties: "Nguyên tố phóng xạ cực độc do Marie Curie phát hiện.", oxidationStates: "-2, +2, +4, +6", highestOxide: "PoO₃", hydroxide: "H₂PoO₄" },
+            { z: 85, symbol: "At", name: "Astatine", period: 6, group: "7A", block: "p", category: "halogen", mass: "210", config: "6s² 6p⁵", electronegativity: "2.2", valenceO: "VII", properties: "Halogen phóng xạ cực hiếm trong tự nhiên, tồn tại dạng rắn bốc hơi.", oxidationStates: "-1, +1, +3, +5, +7", highestOxide: "At₂O₇", hydroxide: "HAtO₄" },
+            { z: 86, symbol: "Rn", name: "Radon", period: 6, group: "8A", block: "p", category: "noble", mass: "222", config: "6s² 6p⁶", electronegativity: "2.2", valenceO: "0", properties: "Khí hiếm phóng xạ sinh ra từ sự phân rã của Radium, có nguy cơ gây ung thư phổi.", oxidationStates: "0, +2", highestOxide: "RnO₃", hydroxide: "Không có" },
+
+            // Period 7
+            { z: 87, symbol: "Fr", name: "Francium", period: 7, group: "1A", block: "s", category: "alkali", mass: "223", config: "7s¹", electronegativity: "0.7", valenceO: "I", properties: "Kim loại kiềm phóng xạ cực kỳ kém bền, thời gian bán rã chỉ 22 phút.", oxidationStates: "0, +1", highestOxide: "Fr₂O", hydroxide: "FrOH (Bazo mạnh)" },
+            { z: 88, symbol: "Ra", name: "Radium", period: 7, group: "2A", block: "s", category: "alkaline", mass: "226", config: "7s²", electronegativity: "0.9", valenceO: "II", properties: "Kim loại kiềm thổ phóng xạ tự phát sáng xanh trong đêm.", oxidationStates: "0, +2", highestOxide: "RaO", hydroxide: "Ra(OH)₂" },
+
+            // Actinides (89-103)
+            { z: 89, symbol: "Ac", name: "Actinium", period: 7, group: "3B", block: "f", category: "actinide", mass: "227", config: "6d¹ 7s²", electronegativity: "1.1", valenceO: "III", properties: "Mở đầu chuỗi Actini, phóng xạ mạnh, phát ánh sáng xanh nhạt.", oxidationStates: "+3", highestOxide: "Ac₂O₃", hydroxide: "Ac(OH)₃" },
+            { z: 90, symbol: "Th", name: "Thorium", period: 7, group: "3B", block: "f", category: "actinide", mass: "232.04", config: "6d² 7s²", electronegativity: "1.3", valenceO: "IV", properties: "Nhiên liệu hạt nhân thế hệ mới an toàn và dồi dào hơn Uranium.", oxidationStates: "+4", highestOxide: "ThO₂", hydroxide: "Th(OH)₄" },
+            { z: 91, symbol: "Pa", name: "Protactinium", period: 7, group: "3B", block: "f", category: "actinide", mass: "231.04", config: "5f² 6d¹ 7s²", electronegativity: "1.5", valenceO: "V", properties: "Nguyên tố phóng xạ độc hại và hiếm.", oxidationStates: "+4, +5", highestOxide: "Pa₂O₅", hydroxide: "HPaO₃" },
+            { z: 92, symbol: "U", name: "Uranium", period: 7, group: "3B", block: "f", category: "actinide", mass: "238.03", config: "5f³ 6d¹ 7s²", electronegativity: "1.38", valenceO: "VI", properties: "Nhiên liệu chính cho các nhà máy điện hạt nhân và vũ khí hạt nhân (U-235).", oxidationStates: "+3, +4, +5, +6", highestOxide: "UO₃", hydroxide: "H₂UO₄" },
+            { z: 93, symbol: "Np", name: "Neptunium", period: 7, group: "3B", block: "f", category: "actinide", mass: "237", config: "5f⁴ 6d¹ 7s²", electronegativity: "1.36", valenceO: "VII", properties: "Nguyên tố siêu uranium phóng xạ đầu tiên được tạo ra.", oxidationStates: "+3, +4, +5, +6, +7", highestOxide: "Np₂O₇", hydroxide: "HNpO₄" },
+            { z: 94, symbol: "Pu", name: "Plutonium", period: 7, group: "3B", block: "f", category: "actinide", mass: "244", config: "5f⁶ 7s²", electronegativity: "1.28", valenceO: "VII", properties: "Nguyên tố phóng xạ quan trọng dùng trong vũ khí hạt nhân và pin phát điện tàu không gian.", oxidationStates: "+3, +4, +5, +6, +7", highestOxide: "PuO₃", hydroxide: "Pu(OH)₄" },
+            { z: 95, symbol: "Am", name: "Americium", period: 7, group: "3B", block: "f", category: "actinide", mass: "243", config: "5f⁷ 7s²", electronegativity: "1.13", valenceO: "VI", properties: "Phát tia Alpha dùng phổ biến trong thiết bị báo khói gia đình.", oxidationStates: "+3, +4, +5, +6", highestOxide: "AmO₂", hydroxide: "Am(OH)₃" },
+            { z: 96, symbol: "Cm", name: "Curium", period: 7, group: "3B", block: "f", category: "actinide", mass: "247", config: "5f⁷ 6d¹ 7s²", electronegativity: "1.28", valenceO: "IV", properties: "Phát ra nhiệt lượng phóng xạ mạnh mẽ,命名 theo Marie & Pierre Curie.", oxidationStates: "+3, +4", highestOxide: "CmO₂", hydroxide: "Cm(OH)₃" },
+            { z: 97, symbol: "Bk", name: "Berkelium", period: 7, group: "3B", block: "f", category: "actinide", mass: "247", config: "5f⁹ 7s²", electronegativity: "1.3", valenceO: "IV", properties: "Phóng xạ nhân tạo tổng hợp tại đại học Berkeley California.", oxidationStates: "+3, +4", highestOxide: "BkO₂", hydroxide: "Bk(OH)₃" },
+            { z: 98, symbol: "Cf", name: "Californium", period: 7, group: "3B", block: "f", category: "actinide", mass: "251", config: "5f¹⁰ 7s²", electronegativity: "1.3", valenceO: "IV", properties: "Nguồn phát neutron cực mạnh, đắt nhất thế giới, dùng khởi động lò phản ứng hạt nhân.", oxidationStates: "+2, +3, +4", highestOxide: "CfO₂", hydroxide: "Cf(OH)₃" },
+            { z: 99, symbol: "Es", name: "Einsteinium", period: 7, group: "3B", block: "f", category: "actinide", mass: "252", config: "5f¹¹ 7s²", electronegativity: "1.3", valenceO: "III", properties: "Phát hiện trong bụi vụ nổ bom nhiệt hạch đầu tiên năm 1952, vinh danh Albert Einstein.", oxidationStates: "+2, +3", highestOxide: "Es₂O₃", hydroxide: "Es(OH)₃" },
+            { z: 100, symbol: "Fm", name: "Fermium", period: 7, group: "3B", block: "f", category: "actinide", mass: "257", config: "5f¹² 7s²", electronegativity: "1.3", valenceO: "III", properties: "Nguyên tố nặng nhất có thể tổng hợp bằng cách bắn phá neutron.", oxidationStates: "+2, +3", highestOxide: "Fm₂O₃", hydroxide: "Fm(OH)₃" },
+            { z: 101, symbol: "Md", name: "Mendelevium", period: 7, group: "3B", block: "f", category: "actinide", mass: "258", config: "5f¹³ 7s²", electronegativity: "1.3", valenceO: "III", properties: "Tổng hợp từng nguyên tử một, đặt tên vinh danh Dmitri Mendeleev - cha đẻ bảng tuần hoàn.", oxidationStates: "+2, +3", highestOxide: "Md₂O₃", hydroxide: "Md(OH)₃" },
+            { z: 102, symbol: "No", name: "Nobelium", period: 7, group: "3B", block: "f", category: "actinide", mass: "259", config: "5f¹⁴ 7s²", electronegativity: "1.3", valenceO: "III", properties: "Đặt theo tên Alfred Nobel, tạo ra trong máy gia tốc hạt.", oxidationStates: "+2, +3", highestOxide: "No₂O₃", hydroxide: "No(OH)₃" },
+            { z: 103, symbol: "Lr", name: "Lawrencium", period: 7, group: "3B", block: "f", category: "actinide", mass: "266", config: "5f¹⁴ 6d¹ 7s²", electronegativity: "1.3", valenceO: "III", properties: "Nguyên tố cuối cùng của chuỗi Actini.", oxidationStates: "+3", highestOxide: "Lr₂O₃", hydroxide: "Lr(OH)₃" },
+
+            // Period 7 Transact actinides (104-118)
+            { z: 104, symbol: "Rf", name: "Rutherfordium", period: 7, group: "4B", block: "d", category: "transition", mass: "267", config: "6d² 7s²", electronegativity: "—", valenceO: "IV", properties: "Nguyên tố siêu nặng nhân tạo, thời gian bán rã rất ngắn.", oxidationStates: "+4", highestOxide: "RfO₂", hydroxide: "Rf(OH)₄" },
+            { z: 105, symbol: "Db", name: "Dubnium", period: 7, group: "5B", block: "d", category: "transition", mass: "268", config: "6d³ 7s²", electronegativity: "—", valenceO: "V", properties: "Tổng hợp tại Dubna (Nga).", oxidationStates: "+5", highestOxide: "Db₂O₅", hydroxide: "HDbO₃" },
+            { z: 106, symbol: "Sg", name: "Seaborgium", period: 7, group: "6B", block: "d", category: "transition", mass: "269", config: "6d⁴ 7s²", electronegativity: "—", valenceO: "VI", properties: "Đặt tên theo nhà hóa học Glenn T. Seaborg.", oxidationStates: "+6", highestOxide: "SgO₃", hydroxide: "H₂SgO₄" },
+            { z: 107, symbol: "Bh", name: "Bohrium", period: 7, group: "7B", block: "d", category: "transition", mass: "270", config: "6d⁵ 7s²", electronegativity: "—", valenceO: "VII", properties: "Vinh danh nhà vật lý Niels Bohr.", oxidationStates: "+7", highestOxide: "Bh₂O₇", hydroxide: "HBhO₄" },
+            { z: 108, symbol: "Hs", name: "Hassium", period: 7, group: "8B", block: "d", category: "transition", mass: "277", config: "6d⁶ 7s²", electronegativity: "—", valenceO: "VIII", properties: "Dự đoán có oxide HsO₄ tương tự Osmium.", oxidationStates: "+8", highestOxide: "HsO₄", hydroxide: "H₂HsO₄" },
+            { z: 109, symbol: "Mt", name: "Meitnerium", period: 7, group: "8B", block: "d", category: "transition", mass: "278", config: "6d⁷ 7s²", electronegativity: "—", valenceO: "IX", properties: "Vinh danh Lise Meitner.", oxidationStates: "+3, +4, +9", highestOxide: "Chưa xác định", hydroxide: "Chưa xác định" },
+            { z: 110, symbol: "Ds", name: "Darmstadtium", period: 7, group: "8B", block: "d", category: "transition", mass: "281", config: "6d⁸ 7s²", electronegativity: "—", valenceO: "VIII", properties: "Tổng hợp tại Darmstadt, Đức.", oxidationStates: "+2, +4, +8", highestOxide: "Chưa xác định", hydroxide: "Chưa xác định" },
+            { z: 111, symbol: "Rg", name: "Roentgenium", period: 7, group: "1B", block: "d", category: "transition", mass: "282", config: "6d⁹ 7s²", electronegativity: "—", valenceO: "III", properties: "Vinh danh Wilhelm Röntgen (người phát minh ra tia X).", oxidationStates: "+3, +5", highestOxide: "Rg₂O₃", hydroxide: "Rg(OH)₃" },
+            { z: 112, symbol: "Cn", name: "Copernicium", period: 7, group: "2B", block: "d", category: "transition", mass: "285", config: "6d¹⁰ 7s²", electronegativity: "—", valenceO: "II", properties: "Vinh danh nhà thiên văn học Nicolaus Copernicus.", oxidationStates: "+2, +4", highestOxide: "CnO", hydroxide: "Cn(OH)₂" },
+            { z: 113, symbol: "Nh", name: "Nihonium", period: 7, group: "3A", block: "p", category: "post-transition", mass: "286", config: "7s² 7p¹", electronegativity: "—", valenceO: "III", properties: "Nguyên tố đầu tiên được phát hiện tại Châu Á (Nhật Bản - Nihon).", oxidationStates: "+1, +3", highestOxide: "Nh₂O₃", hydroxide: "Nh(OH)₃" },
+            { z: 114, symbol: "Fl", name: "Flerovium", period: 7, group: "4A", block: "p", category: "post-transition", mass: "289", config: "7s² 7p²", electronegativity: "—", valenceO: "IV", properties: "Nguyên tố siêu nặng có xu hướng trơ giống như khí hiếm.", oxidationStates: "+2, +4", highestOxide: "FlO₂", hydroxide: "Fl(OH)₄" },
+            { z: 115, symbol: "Mc", name: "Moscovium", period: 7, group: "5A", block: "p", category: "post-transition", mass: "290", config: "7s² 7p³", electronegativity: "—", valenceO: "V", properties: "Đặt tên theo vùng Moscow, Nga.", oxidationStates: "+1, +3", highestOxide: "Mc₂O₅", hydroxide: "HMcO₃" },
+            { z: 116, symbol: "Lv", name: "Livermorium", period: 7, group: "6A", block: "p", category: "post-transition", mass: "293", config: "7s² 7p⁴", electronegativity: "—", valenceO: "VI", properties: "Vinh danh Phòng thí nghiệm Quốc gia Lawrence Livermore.", oxidationStates: "+2, +4", highestOxide: "LvO₃", hydroxide: "H₂LvO₄" },
+            { z: 117, symbol: "Ts", name: "Tennessine", period: 7, group: "7A", block: "p", category: "halogen", mass: "294", config: "7s² 7p⁵", electronegativity: "—", valenceO: "VII", properties: "Halogen siêu nặng tổng hợp nhân tạo, đặt tên theo bang Tennessee, Mỹ.", oxidationStates: "-1, +1, +3, +5", highestOxide: "Ts₂O₇", hydroxide: "HTsO₄" },
+            { z: 118, symbol: "Og", name: "Oganesson", period: 7, group: "8A", block: "p", category: "noble", mass: "294", config: "7s² 7p⁶", electronegativity: "—", valenceO: "0", properties: "Nguyên tố cuối cùng trong bảng tuần hoàn hiện tại (Z=118), vinh danh Giáo sư Yuri Oganessian.", oxidationStates: "0, +2, +4", highestOxide: "OgO₃", hydroxide: "Không có" }
+        ];
+
+        // Standard 18-column grid mappings for standard elements (1-56, 72-88, 104-118)
+        const gridLayout = [
+            {z: 1, r: 1, c: 1}, {z: 2, r: 1, c: 18},
+            {z: 3, r: 2, c: 1}, {z: 4, r: 2, c: 2}, {z: 5, r: 2, c: 13}, {z: 6, r: 2, c: 14}, {z: 7, r: 2, c: 15}, {z: 8, r: 2, c: 16}, {z: 9, r: 2, c: 17}, {z: 10, r: 2, c: 18},
+            {z: 11, r: 3, c: 1}, {z: 12, r: 3, c: 2}, {z: 13, r: 3, c: 13}, {z: 14, r: 3, c: 14}, {z: 15, r: 3, c: 15}, {z: 16, r: 3, c: 16}, {z: 17, r: 3, c: 17}, {z: 18, r: 3, c: 18},
+            {z: 19, r: 4, c: 1}, {z: 20, r: 4, c: 2}, {z: 21, r: 4, c: 3}, {z: 22, r: 4, c: 4}, {z: 23, r: 4, c: 5}, {z: 24, r: 4, c: 6}, {z: 25, r: 4, c: 7}, {z: 26, r: 4, c: 8}, {z: 27, r: 4, c: 9}, {z: 28, r: 4, c: 10}, {z: 29, r: 4, c: 11}, {z: 30, r: 4, c: 12}, {z: 31, r: 4, c: 13}, {z: 32, r: 4, c: 14}, {z: 33, r: 4, c: 15}, {z: 34, r: 4, c: 16}, {z: 35, r: 4, c: 17}, {z: 36, r: 4, c: 18},
+            {z: 37, r: 5, c: 1}, {z: 38, r: 5, c: 2}, {z: 39, r: 5, c: 3}, {z: 40, r: 5, c: 4}, {z: 41, r: 5, c: 5}, {z: 42, r: 5, c: 6}, {z: 43, r: 5, c: 7}, {z: 44, r: 5, c: 8}, {z: 45, r: 5, c: 9}, {z: 46, r: 5, c: 10}, {z: 47, r: 5, c: 11}, {z: 48, r: 5, c: 12}, {z: 49, r: 5, c: 13}, {z: 50, r: 5, c: 14}, {z: 51, r: 5, c: 15}, {z: 52, r: 5, c: 16}, {z: 53, r: 5, c: 17}, {z: 54, r: 5, c: 18},
+            {z: 55, r: 6, c: 1}, {z: 56, r: 6, c: 2}, /* 57-71 in Lanthanide Row */ {z: 72, r: 6, c: 4}, {z: 73, r: 6, c: 5}, {z: 74, r: 6, c: 6}, {z: 75, r: 6, c: 7}, {z: 76, r: 6, c: 8}, {z: 77, r: 6, c: 9}, {z: 78, r: 6, c: 10}, {z: 79, r: 6, c: 11}, {z: 80, r: 6, c: 12}, {z: 81, r: 6, c: 13}, {z: 82, r: 6, c: 14}, {z: 83, r: 6, c: 15}, {z: 84, r: 6, c: 16}, {z: 85, r: 6, c: 17}, {z: 86, r: 6, c: 18},
+            {z: 87, r: 7, c: 1}, {z: 88, r: 7, c: 2}, /* 89-103 in Actinide Row */ {z: 104, r: 7, c: 4}, {z: 105, r: 7, c: 5}, {z: 106, r: 7, c: 6}, {z: 107, r: 7, c: 7}, {z: 108, r: 7, c: 8}, {z: 109, r: 7, c: 9}, {z: 110, r: 7, c: 10}, {z: 111, r: 7, c: 11}, {z: 112, r: 7, c: 12}, {z: 113, r: 7, c: 13}, {z: 114, r: 7, c: 14}, {z: 115, r: 7, c: 15}, {z: 116, r: 7, c: 16}, {z: 117, r: 7, c: 17}, {z: 118, r: 7, c: 18}
+        ];
+
+        // Colors per category
+        const categoryColors = {
+            alkali: "bg-red-950/40 border-red-800/60 text-red-300 hover:bg-red-900/60",
+            alkaline: "bg-amber-950/40 border-amber-800/60 text-amber-300 hover:bg-amber-900/60",
+            transition: "bg-blue-950/40 border-blue-800/60 text-blue-300 hover:bg-blue-900/60",
+            'post-transition': "bg-cyan-950/40 border-cyan-800/60 text-cyan-300 hover:bg-cyan-900/60",
+            metalloid: "bg-teal-950/40 border-teal-800/60 text-teal-300 hover:bg-teal-900/60",
+            nonmetal: "bg-emerald-950/40 border-emerald-800/60 text-emerald-300 hover:bg-emerald-900/60",
+            halogen: "bg-purple-950/40 border-purple-800/60 text-purple-300 hover:bg-purple-900/60",
+            noble: "bg-pink-950/40 border-pink-800/60 text-pink-300 hover:bg-pink-900/60",
+            lanthanide: "bg-rose-950/40 border-rose-800/60 text-rose-300 hover:bg-rose-900/60",
+            actinide: "bg-orange-950/40 border-orange-800/60 text-orange-300 hover:bg-orange-900/60"
+        };
+
+        const categoryNames = {
+            alkali: "Kim loại kiềm",
+            alkaline: "Kim loại kiềm thổ",
+            transition: "Kim loại chuyển tiếp",
+            'post-transition': "Kim loại sau chuyển tiếp",
+            metalloid: "Á kim",
+            nonmetal: "Phi kim",
+            halogen: "Halogen",
+            noble: "Khí hiếm",
+            lanthanide: "Họ Lantan",
+            actinide: "Họ Actini"
+        };
+
+        function createCellElement(el, filter, searchQuery) {
+            const matchCat = (filter === 'all' || el.category === filter);
+            const matchSearch = searchQuery === '' || 
+                el.name.toLowerCase().includes(searchQuery) || 
+                el.symbol.toLowerCase().includes(searchQuery) || 
+                el.z.toString() === searchQuery;
+
+            const isHighlighted = matchCat && matchSearch;
+            const colorClass = categoryColors[el.category] || "bg-slate-900 border-slate-700 text-slate-300";
+
+            const cellDiv = document.createElement('div');
+            cellDiv.className = `aspect-square p-0.5 md:p-1 rounded-lg border flex flex-col justify-between cursor-pointer transition-all duration-200 select-none ${colorClass} ${isHighlighted ? 'opacity-100 scale-100 shadow-md ring-1 ring-indigo-500/50' : 'opacity-20 grayscale scale-95'}`;
+            cellDiv.onclick = () => openModal(el);
+            cellDiv.innerHTML = `
+                <div class="flex justify-between items-start text-[8px] md:text-[9px] font-semibold opacity-75 leading-none">
+                    <span>${el.z}</span>
+                    <span class="text-[7px] md:text-[8px] uppercase opacity-70">${el.block}</span>
+                </div>
+                <div class="text-center my-auto">
+                    <span class="text-xs md:text-sm font-bold block leading-none">${el.symbol}</span>
+                    <span class="text-[7px] md:text-[8px] truncate block opacity-85 mt-0.5">${el.name}</span>
+                </div>
+                <div class="text-[7px] md:text-[8px] text-center opacity-60 truncate leading-none">${el.mass}</div>
+            `;
+            return cellDiv;
+        }
+
+        function renderTable(filter = 'all', searchQuery = '') {
+            const mainContainer = document.getElementById('periodicTable');
+            const lantanContainer = document.getElementById('lanthanideRow');
+            const actiniContainer = document.getElementById('actinideRow');
+            
+            mainContainer.innerHTML = '';
+            lantanContainer.innerHTML = '';
+            actiniContainer.innerHTML = '';
+
+            // Render main grid (Periods 1 to 7)
+            for (let r = 1; r <= 7; r++) {
+                for (let c = 1; c <= 18; c++) {
+                    // Placeholders for Lanthanide (Row 6, Col 3) and Actinide (Row 7, Col 3)
+                    if (r === 6 && c === 3) {
+                        const placeholder = document.createElement('div');
+                        placeholder.className = "aspect-square rounded-lg border border-rose-800/50 bg-rose-950/30 flex items-center justify-center text-[9px] font-bold text-rose-300 cursor-pointer hover:bg-rose-900/40";
+                        placeholder.innerHTML = "57-71";
+                        placeholder.onclick = () => filterCategory('lanthanide');
+                        mainContainer.appendChild(placeholder);
+                        continue;
+                    }
+                    if (r === 7 && c === 3) {
+                        const placeholder = document.createElement('div');
+                        placeholder.className = "aspect-square rounded-lg border border-orange-800/50 bg-orange-950/30 flex items-center justify-center text-[9px] font-bold text-orange-300 cursor-pointer hover:bg-orange-900/40";
+                        placeholder.innerHTML = "89-103";
+                        placeholder.onclick = () => filterCategory('actinide');
+                        mainContainer.appendChild(placeholder);
+                        continue;
+                    }
+
+                    const foundLayout = gridLayout.find(item => item.r === r && item.c === c);
+                    if (foundLayout) {
+                        const el = elementsData.find(item => item.z === foundLayout.z);
+                        if (el) {
+                            mainContainer.appendChild(createCellElement(el, filter, searchQuery));
+                        }
+                    } else {
+                        const emptyCell = document.createElement('div');
+                        emptyCell.className = "aspect-square rounded-lg border border-transparent opacity-0 pointer-events-none";
+                        mainContainer.appendChild(emptyCell);
+                    }
+                }
+            }
+
+            // Render Lanthanides (57 to 71)
+            for (let z = 57; z <= 71; z++) {
+                const el = elementsData.find(item => item.z === z);
+                if (el) lantanContainer.appendChild(createCellElement(el, filter, searchQuery));
+            }
+
+            // Render Actinides (89 to 103)
+            for (let z = 89; z <= 103; z++) {
+                const el = elementsData.find(item => item.z === z);
+                if (el) actiniContainer.appendChild(createCellElement(el, filter, searchQuery));
+            }
+        }
+
+        // Filter Category Handler
+        function filterCategory(cat) {
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm');
+                btn.classList.add('bg-slate-800', 'text-slate-300');
+            });
+            const activeBtn = document.querySelector(`[data-cat="${cat}"]`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-slate-800', 'text-slate-300');
+                activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-sm');
+            }
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            renderTable(cat, query);
+        }
+
+        // Search Input Event
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            const activeCatBtn = document.querySelector('.cat-btn.bg-indigo-600');
+            const cat = activeCatBtn ? activeCatBtn.getAttribute('data-cat') : 'all';
+            renderTable(cat, query);
+        });
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            filterCategory('all');
+        }
+
+        // Modal Controls
+        function openModal(el) {
+            document.getElementById('mSymbol').innerText = el.symbol;
+            document.getElementById('mZ').innerText = `Z = ${el.z}`;
+            document.getElementById('mName').innerText = el.name;
+            document.getElementById('mCategoryTag').innerText = categoryNames[el.category] || el.category;
+            document.getElementById('mPeriod').innerText = el.period;
+            document.getElementById('mGroup').innerText = el.group;
+            document.getElementById('mBlock').innerText = el.block.toUpperCase();
+            document.getElementById('mMass').innerText = el.mass;
+            document.getElementById('mElectronegativity').innerText = el.electronegativity;
+            document.getElementById('mConfig').innerText = el.config;
+            document.getElementById('mValenceO').innerText = el.valenceO;
+            document.getElementById('mProperties').innerText = el.properties;
+            document.getElementById('mOxidation').innerText = el.oxidationStates;
+            document.getElementById('mHighestOxide').innerText = el.highestOxide;
+            document.getElementById('mHydroxide').innerText = el.hydroxide;
+
+            const modal = document.getElementById('elementModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                document.getElementById('modalContentBox').classList.remove('scale-95');
+                document.getElementById('modalContentBox').classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('elementModal');
+            modal.classList.add('opacity-0');
+            document.getElementById('modalContentBox').classList.remove('scale-100');
+            document.getElementById('modalContentBox').classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Close on background click
+        document.getElementById('elementModal').addEventListener('click', (e) => {
+            if (e.target.id === 'elementModal') closeModal();
+        });
+
+        // Initialize table on load
+        window.onload = () => {
+            renderTable();
+        };
+    </script>
+</body>
+</html>
